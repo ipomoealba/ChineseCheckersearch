@@ -4,33 +4,40 @@
 
 class Checkerboard(object):
     """
-    -1: null place
+    -1: canonot go to the place
     0: exist place
     """
+
     def __init__(self, x_num, y_num):
         self.x_num = x_num
         self.y_num = y_num
-        self.checkerboard = dict((self.package_location(x, y), -1) for x in range(-self.x_num + 1, self.x_num)
+        self.checkerboard = dict((self.package_location([x, y]), -1) for x in range(-self.x_num + 1, self.x_num)
                                  for y in range(-self.y_num + 1, self.y_num))
         self.create_space()
 
-    def get_checkerboard(self):
-        return self.checkerboard
-    
-    def package_location(self, x, y):
+    def package_location(self, location):
         """Because of list not hashable in dict, so we use str to deal the problem
         Args:
             location x y
         Returns:
             str
         """
-        return str(x) + "|" + str(y)
+        return "|".join(map(str, location))
 
-    def unpackage_location(self, xy):
-        return [int(i) for i in xy.split("|")]
+    def chess_go(self, start, end, flag):
+        start = package_location(start)
+        end = package_location(end)
+        if checkerboard[end] != 0:
+            raise KeyError
+        else:
+            checkerboard[start] = 0
+            checkerboard[end] = flag
+
+    def unpackage_location(self, location):
+        return map(int, location.split("|"))
 
     def chess_table_can_go(self, location):
-        place = self.checkerboard[self.package_location(location[0], location[1])]
+        place = self.checkerboard[self.package_location(location)]
         if place == 0:
             return True
         else:
@@ -51,7 +58,7 @@ class Checkerboard(object):
             for x in range(min(map_list[0]), max(map_list[0]) + 1):
                 for y in range(min(map_list[1]), max(map_list[1]) + 1):
                     if x + y == k:
-                        self.checkerboard[self.package_location(x, y)] = status
+                        self.checkerboard[self.package_location([x, y])] = status
                         result.append([x, y])
         return result
 
@@ -72,14 +79,9 @@ class Checkerboard(object):
                 results[location] = status
         return results
 
-    def print_checkerboard_graph(self):
-        pass
-
 
 if __name__ == '__main__':
     checkerboard = Checkerboard(8, 8)
     checkerboard.init_barrack(4, 0, 4, -8, 4, -4, status=2)
     print(checkerboard.getChessLocations())
     print(len(checkerboard.getChessLocations()))
-    # print("get checkerboard array: " + checkerboard.get_checkerboard())
-    # print("get checkerboard length: " + len(checkerboard.get_checkerboard()))
