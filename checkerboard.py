@@ -25,13 +25,13 @@ class Checkerboard(object):
         return "|".join(map(str, location))
 
     def chess_go(self, start, end, flag):
-        start = package_location(start)
-        end = package_location(end)
-        if checkerboard[end] != 0:
+        start = self.package_location(start)
+        end = self.package_location(end)
+        if self.checkerboard[end] != 0:
             raise KeyError
         else:
-            checkerboard[start] = 0
-            checkerboard[end] = flag
+            self.checkerboard[start] = 0
+            self.checkerboard[end] = flag
 
     def unpackage_location(self, location):
         return map(int, location.split("|"))
@@ -58,7 +58,8 @@ class Checkerboard(object):
             for x in range(min(map_list[0]), max(map_list[0]) + 1):
                 for y in range(min(map_list[1]), max(map_list[1]) + 1):
                     if x + y == k:
-                        self.checkerboard[self.package_location([x, y])] = status
+                        self.checkerboard[self.package_location(
+                            [x, y])] = status
                         result.append([x, y])
         return result
 
@@ -66,7 +67,7 @@ class Checkerboard(object):
         self.init_barrack(-4, -4, 8, 8, -4, -4, 0)
         self.init_barrack(-8, 4, 4, 4, -8, 4, 0)
 
-    def getChessLocations(self):
+    def getAllChessLocations(self):
         """Get chess location is not empty
         Args:
             None
@@ -78,6 +79,15 @@ class Checkerboard(object):
             if status != 0:
                 results[location] = status
         return results
+
+    def getChessLocationByFlag(self, flag):
+        result = []
+        for location, lflag in self.checkerboard.items():
+            if lflag == flag:
+                result.append(self.unpackage_location(location))
+            else:
+                pass
+        return result
 
 
 if __name__ == '__main__':
