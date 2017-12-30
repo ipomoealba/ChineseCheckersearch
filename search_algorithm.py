@@ -209,7 +209,6 @@ def choose_next_node(initial_states, nodes_list, target):
             result_value = d[1]
             result_initial_state = k
         elif d[1] == tmp_distance and d[2] > tmp_g_distance:
-            print(k, d)
             tmp_distance = d[1]
             result_node = d[0]
             tmp_g_distance = d[2]
@@ -265,20 +264,23 @@ def easy_solution(FLAG,
                   board_size=[8, 8],
                   init_barrak=[4, 0, 4, -8, -4, -4],
                   targets=[-4, 0, -4, 4, 4, 8],
-                  target=[-4, 8]):
+                  target=[-4, 8],
+                  obstacles=[]):
+    # black_list = [[-4, -4, -1, 8, 4, 5], [-8, -5, -5, 4, 1, 5], [-4, -4, -1, -1,-4,-4], ]
     checkerboard = Checkerboard(*board_size)
     init_barrak.append(FLAG)
     init = checkerboard.init_barrack(*init_barrak)
     targets.append(0)
     target_list = checkerboard.init_barrack(*targets)
-    error_place = checkerboard.init_barrack(-4,-4,-1,-1,-4,-4,-1)
+    error_place = checkerboard.init_barrack(-4, -4, -1, -1, -4, -4, -1)
     log.debug("* checkerboard space count: " +
               str(checkerboard.checkerboard.values()))
     log.debug("* checkerboard: " + str(checkerboard.checkerboard))
     log.debug("* init chess count: " + str(len(init)))
-    print(checkerboard.checkerboard)
     k = 0
     step_counter = 0
+    for obstacle in obstacles:
+        checkerboard.checkerboard[checkerboard.package_location(obstacle)] = 100
     while not check_final_status(
             checkerboard=checkerboard, target=target_list, flag=FINAL_FLAG):
         k += 1
@@ -293,21 +295,18 @@ def easy_solution(FLAG,
         next_step = the_step_result[1]
         step_counter += 1
         # print(next_step)
-        print(the_step_result[0])
+        print("(" + the_step_result[0].replace("||", ");(").replace("|", ",")+")")
         result_initial_state = the_step_result[0].split("||")[0].split("|")
         checkerboard.chess_go(result_initial_state, next_step, FLAG)
 
         if next_step == target:
             checkerboard.checkerboard[checkerboard.package_location(
                 target)] = FINAL_FLAG
-            print(target_list)
-            print(target)
             target_list.remove(target)
             if len(target_list) > 0:
                 target = change_target(target, target_list, checkerboard)
             else:
                 break
-            print("target change: " + str(target))
         log.debug("* initial state: " + str(init))
         log.debug("* frontier nodes: " + str(frontier_nodes_list))
         log.debug("* checkerboard status: %s" +
@@ -379,8 +378,19 @@ if __name__ == "__main__":
     FINAL_FLAG = 2
     RESULT_FILE = "results.txt"
     #Q1
+    print("Question1: ")
+    print("=======================================")
+
     easy_solution(FLAG=FLAG, FINAL_FLAG=FINAL_FLAG)
+
+    print("Question1 end")
+    print("=======================================\n")
+
+
     # Q2
+    print("Question2: ")
+    print("=======================================")
+
     easy_solution(
         FLAG=FLAG,
         FINAL_FLAG=FINAL_FLAG,
@@ -389,5 +399,21 @@ if __name__ == "__main__":
         init_barrak=[4, 0, 4, -8, -4, -4],
         targets=[-4, -8, -4, 0, 4, 4],
         target=[-8, 4])
-    # easy_solution(FLAG=FLAG, FINAL_FLAG=FINAL_FLAG, choose_next_node=choose_next_node_reward_jump)
-    # layer_search(FLAG=FLAG, FINAL_FLAG=FINAL_FLAG, max_layer=1)
+
+    print("Question2 end")
+    print("=======================================\n")
+    # Q3
+    print("Question3: ")
+    print("=======================================")
+
+    obstacles = []
+    with open("obstacle.txt", "r") as f:
+        for i in f.readlines():
+            obstacles.append(map(int,i.replace("\n","")[1:-1].split(",")))
+    print("obstacles: " + str(obstacles))
+    easy_solution(FLAG=FLAG, FINAL_FLAG=FINAL_FLAG,
+                  board_size=[8, 8],
+                  init_barrak=[4, 0, 4, -8, -4, -4],
+                  targets=[-4, 0, -4, 4, 4, 8],
+                  target=[-4, 8],
+                  obstacles=obstacles)
